@@ -1,14 +1,15 @@
 package ir.ac.kntu;
 
 public class Process implements Runnable{
+    private int pid;
     private int arrivalTime;
     private int cpuBurst;
     private int coreNeeded;
-    private int priority;
     private String state;
 
 
-    public Process(int arrivalTime, int cpuBurst, int coreNeeded) {
+    public Process(int arrivalTime, int cpuBurst, int coreNeeded, int pid) {
+        this.pid = pid;
         this.arrivalTime = arrivalTime;
         this.cpuBurst = cpuBurst;
         this.coreNeeded = coreNeeded;
@@ -18,12 +19,11 @@ public class Process implements Runnable{
     public void run() {
         try {
             CPU.getInstance().Login(this.coreNeeded);
-            this.state = "running";
-            System.out.println("process running for" + this.arrivalTime);
+            setState("running");
+            System.out.println("process " + this.pid +" is running");
             Thread.sleep(this.cpuBurst * 1000);
-            this.state = "terminated";
+            setState("terminated");
             CPU.getInstance().logout(this.coreNeeded);
-            System.out.println("available cores: " + CPU.getInstance().availableSlots());
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -54,18 +54,22 @@ public class Process implements Runnable{
     }
 
     public String getState() {
-        return state;
+        synchronized (state) {
+            return state;
+        }
     }
 
     public void setState(String state) {
-        this.state = state;
+        synchronized (state){
+            this.state = state;
+        }
     }
 
-    public int getPriority() {
-        return priority;
+    public int getPid() {
+        return pid;
     }
 
-    public void setPriority(int priority) {
-        this.priority = priority;
+    public void setPid(int pid) {
+        this.pid = pid;
     }
 }

@@ -38,6 +38,10 @@ public class CPU {
         return semaphore.availablePermits();
     }
 
+    public int getCores() {
+        return cores;
+    }
+
     public void setCores(int cores) {
         this.cores = cores;
     }
